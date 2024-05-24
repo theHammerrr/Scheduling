@@ -1,9 +1,9 @@
-import styled from "styled-components";
-import { useConstraintContext } from "../Contexts/ConstraintContext/ConstraintsProvider";
-import { shiftSchedulingGA } from "../../Static/GenerateScheduals/GenerateSchedual";
-import { ePeopleOptions } from "../Contexts/ConstraintContext/people";
-import { iShiftSchedulingGA } from "../../Static/GenerateScheduals/Types";
 import { useState } from "react";
+import styled from "styled-components";
+import { shiftSchedulingGA } from "../../Static/GenerateScheduals/GenerateSchedual";
+import { iShiftSchedulingGA } from "../../Static/GenerateScheduals/Types";
+import { useConstraintContext } from "../Contexts/ConstraintContext/ConstraintsProvider";
+import { ePeopleOptions } from "../Contexts/ConstraintContext/people";
 import Loader from "../Loader/Loader";
 
 const GENERATE_BUTTON_TEXT = "לחץ כאן לקבלת משמרות";
@@ -24,11 +24,8 @@ const GeneratorButton = styled.button`
   border-radius: 40px;
 `;
 
-// const worker = new Worker("./worker.js");
-
 const SchedulesContainer: React.FC = () => {
-  const [showScheduleLoader, setShowScheduleLoader] = useState<boolean>(false);
-
+  const [showScheduleLoader, setShowScheduleLoader] = useState<boolean>(false); //TODO: cannot use loader right now...
   const { constraints } = useConstraintContext();
 
   const handleGenerateSchedualsClick = async () => {

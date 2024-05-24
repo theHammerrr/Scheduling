@@ -1,29 +1,6 @@
 import { fitnessFunction } from "./Fitness";
 import { iFitnessFunction, iShiftSchedule, iShiftSchedulingGA } from "./Types";
 
-// export class ShiftScheduling implements iShiftSchedulingGA{
-//     people: string[] = [];
-//     numDays?: number;
-//     constraints: iConstraint[] = [];
-//     populationSize?: number;
-//     generations?: number;
-//     mutationRate?: number;
-//     crossoverRate?: number;
-
-//     constructor({
-//         people,
-//         numDays = 7,
-//         constraints, //TODO: use constraints
-//         populationSize = 100,
-//         generations = 1000,
-//         crossoverRate = 0.5,
-//         mutationRate = 0.1
-//     }: iShiftSchedulingGA) {
-//         this.people
-//     }
-
-// }
-
 const initializePopulation = (
     populationSize: number,
     numDays: number,
