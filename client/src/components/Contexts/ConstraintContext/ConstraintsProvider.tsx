@@ -10,6 +10,17 @@ export enum eShitType {
 export enum eConstraintType {
   CANNOT = "לא יכול",
   MUST = "חייב",
+  Prefer = "מעדיף",
+}
+
+export enum eDayInTheWeek {
+  SUNDAY = "ראשון",
+  MONDAY = "שני",
+  TUESDAY = "שלישי",
+  WEDNESDAY = "רביעי",
+  THURSDAY = "חמישי",
+  FRIDAY = "שישי",
+  SATURDAY = "שבת",
 }
 
 export interface iConstraint {
@@ -17,6 +28,7 @@ export interface iConstraint {
   person: ePeopleOptions;
   constraintType: eConstraintType;
   shiftType: eShitType;
+  day: eDayInTheWeek;
 }
 
 export interface iConstraintContext {

@@ -2,6 +2,7 @@ import styled from "styled-components";
 import Dropdown from "../DropDown/DropDown";
 import {
   eConstraintType,
+  eDayInTheWeek,
   eShitType,
   iConstraint,
 } from "../Contexts/ConstraintContext/ConstraintsProvider";
@@ -22,14 +23,17 @@ const ConstraintBoxDiv = styled.div`
   padding: 7px;
   gap: 10px;
   border-radius: 30px;
-  @media only screen and (max-width: 600px) {
-  }
 `;
 
 const TrushIcon = styled.img`
   width: 20px;
   cursor: pointer;
 `;
+
+const POSSIBLE_PEOPLE = Object.values(ePeopleOptions);
+const POSSIBLE_CONSTRAINT_TYPES = Object.values(eConstraintType);
+const POSSIBLE_DAYS = Object.values(eDayInTheWeek);
+const POSSIBLE_SHIFTS = Object.values(eShitType);
 
 const ConstraintBox: React.FC<iConstraintBoxProps> = ({
   currentConstraint,
@@ -55,6 +59,12 @@ const ConstraintBox: React.FC<iConstraintBoxProps> = ({
       shiftType: newShiftType as eShitType,
     });
   };
+  const handleChangeDay = (newDay: string) => {
+    setConstraint({
+      ...currentConstraint,
+      day: newDay as eDayInTheWeek,
+    });
+  };
 
   const handleDeleteConstraint = () => {
     deleteConstraint(currentConstraint);
@@ -65,17 +75,22 @@ const ConstraintBox: React.FC<iConstraintBoxProps> = ({
       <Dropdown
         currentFilter={currentConstraint.person}
         handleClickItem={handleChangePerson}
-        possibleStates={Object.values(ePeopleOptions)}
+        possibleStates={POSSIBLE_PEOPLE}
       />
       <Dropdown
         currentFilter={currentConstraint.constraintType}
         handleClickItem={handleChangeConstraintType}
-        possibleStates={Object.values(eConstraintType)}
+        possibleStates={POSSIBLE_CONSTRAINT_TYPES}
+      />
+      <Dropdown
+        currentFilter={currentConstraint.day}
+        handleClickItem={handleChangeDay}
+        possibleStates={POSSIBLE_DAYS}
       />
       <Dropdown
         currentFilter={currentConstraint.shiftType}
         handleClickItem={handleChangeShiftType}
-        possibleStates={Object.values(eShitType)}
+        possibleStates={POSSIBLE_SHIFTS}
       />
       <TrushIcon src="/icons/trash.svg" onClick={handleDeleteConstraint} />
     </ConstraintBoxDiv>

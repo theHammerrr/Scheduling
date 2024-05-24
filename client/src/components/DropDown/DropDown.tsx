@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 interface iDropdownProps {
-  currentFilter: string | undefined;
+  currentFilter?: string;
   handleClickItem: (state: string) => void;
   possibleStates: string[];
 }
@@ -27,7 +27,6 @@ const Dropdown: React.FC<iDropdownProps> = ({
         className="dropdown-select"
         onChange={handleOnChange}
         value={currentFilter}
-        style={{ cursor: "pointer", borderRadius: "30px", padding: "5px" }}
       >
         {possibleStates.map((value) => (
           <option key={value} value={value}>

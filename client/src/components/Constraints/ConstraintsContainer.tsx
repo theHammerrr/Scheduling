@@ -2,6 +2,7 @@ import styled from "styled-components";
 import ConstraintBox from "./ConstraintBox";
 import {
   eConstraintType,
+  eDayInTheWeek,
   eShitType,
   iConstraint,
   useConstraintContext,
@@ -12,11 +13,13 @@ import { v4 as uuidv4 } from "uuid";
 const ConstraintsContainerDiv = styled.div`
   display: flex;
   flex-direction: column;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  min-width: 350px;
+  margin: 20px 30px 0 0;
+  width: 30%;
   gap: 10px;
+
+  @media only screen and (max-width: 600px) {
+    max-width: 100px;
+  }
 `;
 
 const AddConstraintsButton = styled.button`
@@ -32,6 +35,7 @@ const getNewDefaultConstraint = (): iConstraint => {
     constraintType: eConstraintType.CANNOT,
     person: ePeopleOptions.IDO,
     shiftType: eShitType.MORNING,
+    day: eDayInTheWeek.SUNDAY,
   };
 };
 
