@@ -88,4 +88,5 @@ export const fitnessFunction: iFitnessFunction = (schedule, numDays, employees, 
     return score;
 };
 
-// 
+// Todo: different scores between night and morning, between the end of the week and start of the week. 
+// Or use table to calculate "justice" that someone who did a lot of nights will not do nights next week.
