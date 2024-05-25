@@ -1,5 +1,6 @@
 import { fitnessFunction } from "./Fitness";
-import { iFitnessFunction, iShiftSchedule, iShiftSchedulingGA } from "./Types";
+import { ConstraintsPerPerson, iFitnessFunction, iShiftSchedule, iShiftSchedulingGA } from "./Types";
+import { eConstraintType, eShitType, iConstraint } from "../../components/Contexts/ConstraintContext/ConstraintsProvider";
 
 const initializePopulation = (
     populationSize: number,
@@ -11,8 +12,8 @@ const initializePopulation = (
         const schedule: iShiftSchedule = {};
         for (let day = 0; day < numDays; day++) {
             schedule[day] = {
-                morning: peoples[Math.floor(Math.random() * peoples.length)],
-                night: peoples[Math.floor(Math.random() * peoples.length)]
+                [eShitType.MORNING] : peoples[Math.floor(Math.random() * peoples.length)],
+                [eShitType.NIGHT]: peoples[Math.floor(Math.random() * peoples.length)]
             };
         }
         population.push(schedule);
@@ -24,15 +25,16 @@ const selectParent = (
     population: iShiftSchedule[],
     numDays: number,
     people: string[],
-    fitnessFunction: iFitnessFunction): iShiftSchedule => {
+    fitnessFunction: iFitnessFunction,
+    constraintsPerPerson: ConstraintsPerPerson): iShiftSchedule => {
     const tournamentSize = 5;
     let bestSchedule = population[Math.floor(Math.random() * population.length)];
 
     for (let i = 0; i < tournamentSize; i++) {
         const contender = population[Math.floor(Math.random() * population.length)];
 
-        if (fitnessFunction(contender, numDays, people) >
-            fitnessFunction(bestSchedule, numDays, people)) {
+        if (fitnessFunction(contender, numDays, people, constraintsPerPerson) >
+            fitnessFunction(bestSchedule, numDays, people, constraintsPerPerson)) {
             bestSchedule = contender;
         }
     }
@@ -68,11 +70,28 @@ const mutate = (
     const mutatedSchedule: iShiftSchedule = {};
     for (let day = 0; day < numDays; day++) {
         mutatedSchedule[day] = {
-            morning: Math.random() < mutationRate ? employees[Math.floor(Math.random() * employees.length)] : schedule[day].morning,
-            night: Math.random() < mutationRate ? employees[Math.floor(Math.random() * employees.length)] : schedule[day].night
+            [eShitType.MORNING]: Math.random() < mutationRate ? employees[Math.floor(Math.random() * employees.length)] : schedule[day][eShitType.MORNING],
+            [eShitType.NIGHT]: Math.random() < mutationRate ? employees[Math.floor(Math.random() * employees.length)] : schedule[day][eShitType.NIGHT]
         };
     }
     return mutatedSchedule;
+}
+
+const convertConstraintToConstraintsPerPerson = (constraints: iConstraint[], people: string[]): ConstraintsPerPerson => {
+    const constraintsPerPerson: ConstraintsPerPerson = {}
+    console.log(constraints);
+    
+    people.forEach((person) => {
+        const personConstraints = constraints.filter(constraint => constraint.person === person)
+
+        Object.values(eConstraintType).forEach((constraintType) => {
+            const personConstraintsType = personConstraints.filter(constraint => constraint.constraintType === constraintType)
+            constraintsPerPerson[person] = {...constraintsPerPerson[person], [constraintType]: personConstraintsType}
+        }) 
+
+    })
+
+    return constraintsPerPerson
 }
 
 export const shiftSchedulingGA = ({
@@ -84,6 +103,9 @@ export const shiftSchedulingGA = ({
     crossoverRate = 0.5,
     mutationRate = 0.1
 }: iShiftSchedulingGA): Promise<iShiftSchedule> => {
+    const constraintsPerPerson = convertConstraintToConstraintsPerPerson(constraints, people)
+    // console.log(constraintsPerPerson['יוני בל'][eConstraintType.CANNOT]);
+    
     return new Promise((resolve, reject) => {
         const startTime = performance.now();
 
@@ -94,8 +116,8 @@ export const shiftSchedulingGA = ({
             const newPopulation: iShiftSchedule[] = [];
 
             for (let i = 0; i < populationSize; i++) {
-                const parent1 = selectParent(population, numDays, people, fitnessFunction);
-                const parent2 = selectParent(population, numDays, people, fitnessFunction);
+                const parent1 = selectParent(population, numDays, people, fitnessFunction, constraintsPerPerson);
+                const parent2 = selectParent(population, numDays, people, fitnessFunction, constraintsPerPerson);
                 const [child1, child2] = crossover(parent1, parent2, crossoverRate, numDays);
                 const mutatedChild1 = mutate(child1, mutationRate, numDays, people);
                 const mutatedChild2 = mutate(child2, mutationRate, numDays, people);
@@ -104,15 +126,15 @@ export const shiftSchedulingGA = ({
 
             population = newPopulation;
             const populationScore: number[] = population.map((schedule) =>
-                fitnessFunction(schedule, numDays, people)
-            )
+                fitnessFunction(schedule, numDays, people, constraintsPerPerson)
+            ) //TODO: remove
 
             const fittestScheduleIndex = populationScore.reduce((maxIndex, elem, i, arr) =>
                 elem > arr[maxIndex] ? i : maxIndex, 0);
             const fittestSchedule = population[fittestScheduleIndex]
 
-            if (fitnessFunction(fittestSchedule, numDays, people) >
-                fitnessFunction(bestSchedule, numDays, people)) {
+            if (fitnessFunction(fittestSchedule, numDays, people, constraintsPerPerson) >
+                fitnessFunction(bestSchedule, numDays, people, constraintsPerPerson)) {
                 bestSchedule = fittestSchedule;
             }
         }
