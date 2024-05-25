@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { shiftSchedulingGA } from "../../Static/GenerateScheduals/GenerateSchedual";
 import { iShiftSchedule, iShiftSchedulingGA } from "../../Static/GenerateScheduals/Types";
-import { useConstraintContext } from "../Contexts/ConstraintContext/ConstraintsProvider";
+import { iConstraint, useConstraintContext } from "../Contexts/ConstraintContext/ConstraintsProvider";
 import { ePeopleOptions } from "../Contexts/ConstraintContext/people";
 import Loader from "../Loader/Loader";
 import SchedualTable from "./ScheduleTable";
@@ -32,7 +32,6 @@ const GeneratorButton = styled.button`
   }
 
 `;
-
 
 const SchedulesContainer: React.FC = () => {
   const [showScheduleLoader, setShowScheduleLoader] = useState<boolean>(false); //TODO: cannot use loader right now...

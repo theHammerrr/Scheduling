@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import Dropdown from "../DropDown/DropDown";
 import {
+  daysInWeekText,
   eConstraintType,
   eDayInTheWeek,
   eShitType,
@@ -32,7 +33,7 @@ const TrushIcon = styled.img`
 
 const POSSIBLE_PEOPLE = Object.values(ePeopleOptions);
 const POSSIBLE_CONSTRAINT_TYPES = Object.values(eConstraintType);
-const POSSIBLE_DAYS = Object.values(eDayInTheWeek);
+const POSSIBLE_DAYS = Object.values(daysInWeekText)
 const POSSIBLE_SHIFTS = Object.values(eShitType);
 
 const ConstraintBox: React.FC<iConstraintBoxProps> = ({
@@ -59,10 +60,13 @@ const ConstraintBox: React.FC<iConstraintBoxProps> = ({
       shiftType: newShiftType as eShitType,
     });
   };
+
   const handleChangeDay = (newDay: string) => {
+    const day = Object.entries(daysInWeekText).filter(([key, value]) => value === newDay)[0][0]
+    
     setConstraint({
       ...currentConstraint,
-      day: newDay as eDayInTheWeek,
+      day: +day as eDayInTheWeek,
     });
   };
 
@@ -83,7 +87,7 @@ const ConstraintBox: React.FC<iConstraintBoxProps> = ({
         possibleStates={POSSIBLE_CONSTRAINT_TYPES}
       />
       <Dropdown
-        currentFilter={currentConstraint.day}
+        currentFilter={daysInWeekText[currentConstraint.day]}
         handleClickItem={handleChangeDay}
         possibleStates={POSSIBLE_DAYS}
       />

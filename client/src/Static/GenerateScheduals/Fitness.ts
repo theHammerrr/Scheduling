@@ -1,9 +1,28 @@
-import { eConstraintType, eShitType } from "../../components/Contexts/ConstraintContext/ConstraintsProvider";
+import { eConstraintType, eShitType, iConstraint } from "../../components/Contexts/ConstraintContext/ConstraintsProvider";
 import { iFitnessFunction } from "./Types";
 
-let times = 1
-export const fitnessFunction: iFitnessFunction = (schedule, numDays, employees, constraintPerPerson ,shiftBreak = 2) => {
+const doesPersonHaveConstraintOnShift = (
+    constraints: iConstraint[],
+    person: string,
+    constraintType: eConstraintType,
+    shiftType: eShitType, 
+    day: number): boolean => {
+        let haveConstraint = false
+        constraints.forEach((constraint) => {
+            haveConstraint = haveConstraint || (
+                constraint.person === person &&
+                constraint.day === day && 
+                constraint.shiftType === shiftType &&
+                constraint.constraintType === constraintType
+            )
+        })
+
+        return haveConstraint
+}
+
+export const fitnessFunction: iFitnessFunction = (schedule, numDays, employees, constraints ,shiftBreak = 2) => {
     //TODO: if shift type will be dynamic, there will be a need to change here
+    //TODO: maybe split to functions 
 
     let score = 0;
     const shiftsCount: { [employee: string]: number } = {};
@@ -11,53 +30,62 @@ export const fitnessFunction: iFitnessFunction = (schedule, numDays, employees, 
 
     for (let day = 0; day < numDays; day++) {
         const scheduleDay = schedule[day];
-        const morning = scheduleDay[eShitType.MORNING]
-        const night = scheduleDay[eShitType.NIGHT]
+        const personInTheMorning = scheduleDay[eShitType.MORNING]        
+        const personInTheNight = scheduleDay[eShitType.NIGHT]
 
         // Increment shift counts for each employee
-        shiftsCount[morning] = (shiftsCount[morning] || 0) + 1;
-        shiftsCount[night] = (shiftsCount[night] || 0) + 1;
+        shiftsCount[personInTheMorning] = (shiftsCount[personInTheMorning] || 0) + 1;
+        shiftsCount[personInTheNight] = (shiftsCount[personInTheNight] || 0) + 1;
 
         // Check for shift breaks
-        if (lastShiftDay[morning] !== undefined && (day - lastShiftDay[morning]) < shiftBreak) {
+        if (lastShiftDay[personInTheMorning] !== undefined && (day - lastShiftDay[personInTheMorning]) < shiftBreak) {
             score -= 10; // Penalize if there's no x-shift break for morning shift employee
         }
-        if (lastShiftDay[night] !== undefined && (day - lastShiftDay[night]) < shiftBreak) {
+        if (lastShiftDay[personInTheNight] !== undefined && (day - lastShiftDay[personInTheNight]) < shiftBreak) {
             score -= 10; // Penalize if there's no x-shift break for night shift employee
         }
 
         // Update last shift day
-        lastShiftDay[morning] = day;
-        lastShiftDay[night] = day;
+        lastShiftDay[personInTheMorning] = day;
+        lastShiftDay[personInTheNight] = day;
 
         // Ensure no employee is assigned both shifts on the same day
-        if (morning === night) {
+        if (personInTheMorning === personInTheNight) {
             return -20; // Penalize heavily if the same person is assigned both shifts
         }
 
-        // const morningShiftCannotConstraint = constraintPerPerson[morning][eConstraintType.CANNOT]
-        const morningShiftCannotConstraint = constraintPerPerson[morning][eConstraintType.CANNOT]
-        const nightShiftCannotConstraint = constraintPerPerson[night][eConstraintType.CANNOT]
-
-        if (!!morningShiftCannotConstraint.length ) {
-            times && console.log(`morningShiftCannotConstraint: ${morningShiftCannotConstraint}`);
-            times && console.log(morningShiftCannotConstraint);
-            times = 0
-
-            return score -= 5000
+        //TODO: do dynamic
+        if (doesPersonHaveConstraintOnShift(constraints, personInTheMorning, eConstraintType.CANNOT ,eShitType.MORNING, day)) {
+            score -= 50
         }
-        if (!!nightShiftCannotConstraint.length && nightShiftCannotConstraint.includes(day)) {
-            return score -= 5000
+        if (doesPersonHaveConstraintOnShift(constraints, personInTheNight, eConstraintType.CANNOT ,eShitType.NIGHT, day)) {
+            score -= 50
+        }
+
+        if (doesPersonHaveConstraintOnShift(constraints, personInTheMorning, eConstraintType.MUST ,eShitType.MORNING, day)) {
+            score += 50
+        }
+        if (doesPersonHaveConstraintOnShift(constraints, personInTheNight, eConstraintType.MUST ,eShitType.NIGHT, day)) {
+            score += 50
+        }
+        
+        if (doesPersonHaveConstraintOnShift(constraints, personInTheMorning, eConstraintType.PREFER ,eShitType.MORNING, day)) {
+            score += 20
+        }
+        if (doesPersonHaveConstraintOnShift(constraints, personInTheNight, eConstraintType.PREFER ,eShitType.NIGHT, day)) {
+            score += 20
         }
     }
 
     // Balance shifts among employees
     const maxShifts = Math.max(...Object.values(shiftsCount));
     const minShifts = Math.min(...Object.values(shiftsCount));
-    score -= (maxShifts - minShifts) * 5; // Penalize imbalance in shift distribution
+    score -= (maxShifts - minShifts) * 10; // Penalize imbalance in shift distribution
 
     // Reward for evenly distributed shifts
     score += (employees.length - (maxShifts - minShifts));
 
     return score;
 };
+
+// 

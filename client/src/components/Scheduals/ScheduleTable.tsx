@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { iShiftSchedule } from "../../Static/GenerateScheduals/Types"
-import { eDayInTheWeek, eShitType } from "../Contexts/ConstraintContext/ConstraintsProvider"
+import { daysInWeekText, eDayInTheWeek, eShitType } from "../Contexts/ConstraintContext/ConstraintsProvider"
 import { useEffect, useState } from "react"
 
 const ScheduleTableStyled = styled.table`
@@ -20,7 +20,7 @@ const ScheduleTableBody = styled.tbody`
     background-color: #a4ffe7;
 `
 
-const DAYS_BY_INDEX: string[] = Object.values(eDayInTheWeek)
+const DAYS_IN_WEEK_ARRAY = Object.keys(eDayInTheWeek).filter(key => !isNaN(Number(key)))
 const SHIFT_TYPES = Object.values(eShitType)
 const SHIFT_TYPE_TEXT = "סוג משמרת"
 
@@ -32,8 +32,6 @@ const SchedualTable: React.FC<iScheduleTableProps> = ({
     schedule
 }: iScheduleTableProps) => {    
     const [shifts, setShifts] = useState(Object.values(schedule))
-    console.log(shifts);
-    
 
     useEffect(() => {
         setShifts(Object.values(schedule))
@@ -43,8 +41,8 @@ const SchedualTable: React.FC<iScheduleTableProps> = ({
         <ScheduleTableHead>
             <tr>
                 <ScheduleTableCell>{SHIFT_TYPE_TEXT}</ScheduleTableCell>
-                {Object.keys(schedule).map((key, index) => (
-                    <ScheduleTableCell key={index}>{DAYS_BY_INDEX[+key]}</ScheduleTableCell>
+                {DAYS_IN_WEEK_ARRAY.map((key) => (
+                    <ScheduleTableCell key={key}>{daysInWeekText[+key as eDayInTheWeek]}</ScheduleTableCell>
                 ))}
             </tr>
         </ScheduleTableHead>

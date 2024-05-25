@@ -10,17 +10,27 @@ export enum eShitType {
 export enum eConstraintType {
   CANNOT = "לא יכול",
   MUST = "חייב",
-  Prefer = "מעדיף",
+  PREFER = "מעדיף",
 }
 
 export enum eDayInTheWeek {
-  SUNDAY = "ראשון",
-  MONDAY = "שני",
-  TUESDAY = "שלישי",
-  WEDNESDAY = "רביעי",
-  THURSDAY = "חמישי",
-  FRIDAY = "שישי",
-  SATURDAY = "שבת",
+  SUNDAY,
+  MONDAY,
+  TUESDAY,
+  WEDNESDAY,
+  THURSDAY,
+  FRIDAY,
+  SATURDAY,
+}
+
+export const daysInWeekText: {[key in eDayInTheWeek]: string} = {
+  [eDayInTheWeek.SUNDAY]: "ראשון",
+  [eDayInTheWeek.MONDAY]: "שני",
+  [eDayInTheWeek.TUESDAY]: "שלישי",
+  [eDayInTheWeek.WEDNESDAY]: "רביעי",
+  [eDayInTheWeek.THURSDAY]: "חמישי",
+  [eDayInTheWeek.FRIDAY]: "שישי",
+  [eDayInTheWeek.SATURDAY]: "שבת"
 }
 
 export interface iConstraint {
